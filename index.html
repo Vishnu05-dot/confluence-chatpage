@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confluence Chatbot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    #chatContainer {
+      width: 100%;
+      max-width: 400px;
+    }
+    #chatInput {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    #sendBtn {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+    }
+    #chatResponse {
+      margin-top: 12px;
+      padding: 8px;
+      background: #f1f1f1;
+      min-height: 50px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div id="chatContainer">
+    <input 
+      id="chatInput"
+      type="text"
+      placeholder="Ask me anything…"
+    />
+    <button id="sendBtn">Send</button>
+    <div id="chatResponse">Your answer will appear here.</div>
+  </div>
+
+  <script>
+    document.getElementById('sendBtn').onclick = async () => {
+      const question = document.getElementById('chatInput').value;
+      const res = await fetch('https://infinig.app.n8n.cloud/webhook-test/916f5364-1ae3-405c-a9c9-b1b2869e95e9', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question })
+      });
+      const json = await res.json();
+      document.getElementById('chatResponse').innerText =
+        json.response || 'No reply yet.';
+    };
+  </script>
+</body>
+</html>
