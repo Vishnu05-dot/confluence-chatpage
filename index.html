@@ -11,54 +11,142 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
+      padding: 20px;
       margin: 0;
+      background: #fafafa;
     }
     #chatContainer {
       width: 100%;
-      max-width: 400px;
+      max-width: 450px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      background: #fff;
+      overflow: hidden;
+    }
+    #chatHeader {
+      background: #1976d2;
+      color: white;
+      padding: 12px;
+      font-size: 18px;
+      text-align: center;
+    }
+    #chatBody {
+      padding: 16px;
     }
     #chatInput {
-      width: 100%;
+      width: calc(100% - 16px);
       padding: 8px;
+      margin-bottom: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
       box-sizing: border-box;
+    }
+    #buttonGroup {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    #sendBtn, #clearBtn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
     }
     #sendBtn {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
+      background: #1976d2;
+      color: #fff;
+    }
+    #sendBtn:hover {
+      background: #115293;
+    }
+    #clearBtn {
+      background: #e0e0e0;
+      color: #333;
+    }
+    #clearBtn:hover {
+      background: #bdbdbd;
     }
     #chatResponse {
-      margin-top: 12px;
-      padding: 8px;
-      background: #f1f1f1;
-      min-height: 50px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 4px;
+      background: #f9f9f9;
+      padding: 12px;
       box-sizing: border-box;
+    }
+    .message {
+      margin-bottom: 16px;
+    }
+    .message hr {
+      border: 0;
+      border-top: 1px solid #ddd;
+      margin: 8px 0;
+    }
+    .message p {
+      margin: 0;
+      line-height: 1.4;
+      color: #333;
     }
   </style>
 </head>
 <body>
   <div id="chatContainer">
-    <input 
-      id="chatInput"
-      type="text"
-      placeholder="Ask me anything…"
-    />
-    <button id="sendBtn">Send</button>
-    <div id="chatResponse">Your answer will appear here.</div>
+    <div id="chatHeader">Ask the AI 📖</div>
+    <div id="chatBody">
+      <input 
+        id="chatInput"
+        type="text"
+        placeholder="Type your question here…"
+      />
+      <div id="buttonGroup">
+        <button id="sendBtn">Send</button>
+        <button id="clearBtn">Clear</button>
+      </div>
+      <div id="chatResponse">
+        <!-- Answers will appear here -->
+      </div>
+    </div>
   </div>
 
   <script>
+    const webhookUrl = 'https://infinig.app.n8n.cloud/webhook-test/916f5364-1ae3-405c-a9c9-b1b2869e95e9';
+
     document.getElementById('sendBtn').onclick = async () => {
-      const question = document.getElementById('chatInput').value;
-      const res = await fetch('https://infinig.app.n8n.cloud/webhook-test/916f5364-1ae3-405c-a9c9-b1b2869e95e9', {
+      const questionField = document.getElementById('chatInput');
+      const question = questionField.value.trim();
+      if (!question) return; // Do nothing if input is empty
+
+      // Send the question to n8n
+      const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question })
       });
       const json = await res.json();
-      document.getElementById('chatResponse').innerText =
-        json.response || 'No reply yet.';
+      const answerText = json.response || 'No reply yet.';
+
+      // Append the answer as a new styled message
+      const chatResponse = document.getElementById('chatResponse');
+      const messageDiv = document.createElement('div');
+      messageDiv.className = 'message';
+      messageDiv.innerHTML = `
+        <hr />
+        <p>${answerText}</p>
+      `;
+      chatResponse.appendChild(messageDiv);
+
+      // Scroll to bottom if overflow
+      chatResponse.scrollTop = chatResponse.scrollHeight;
+    };
+
+    document.getElementById('clearBtn').onclick = () => {
+      document.getElementById('chatInput').value = '';
+      document.getElementById('chatResponse').innerHTML = '';
+      document.getElementById('chatInput').focus();
     };
   </script>
 </body>
