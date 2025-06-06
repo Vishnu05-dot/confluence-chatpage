@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Confluence Chatbot</title>
   <style>
+    /* Overall container */
     body {
       font-family: Arial, sans-serif;
       display: flex;
@@ -15,15 +16,19 @@
       margin: 0;
       background: #fafafa;
     }
+
+    /* Chat box wrapper */
     #chatContainer {
       width: 100%;
-      max-width: 450px;
+      max-width: 500px;
       border: 1px solid #ddd;
       border-radius: 8px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       background: #fff;
       overflow: hidden;
     }
+
+    /* Header bar */
     #chatHeader {
       background: #1976d2;
       color: white;
@@ -31,22 +36,31 @@
       font-size: 18px;
       text-align: center;
     }
+
+    /* Body (input + response) */
     #chatBody {
       padding: 16px;
     }
+
+    /* The question input field */
     #chatInput {
       width: calc(100% - 16px);
-      padding: 8px;
-      margin-bottom: 8px;
+      padding: 10px;
+      margin-bottom: 12px;
       border: 1px solid #ccc;
       border-radius: 4px;
       box-sizing: border-box;
+      font-size: 14px;
     }
+
+    /* Button row */
     #buttonGroup {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
+
+    /* Send & Clear buttons */
     #sendBtn, #clearBtn {
       flex: 1;
       padding: 10px;
@@ -69,35 +83,42 @@
     #clearBtn:hover {
       background: #bdbdbd;
     }
+
+    /* Response area */
     #chatResponse {
-      max-height: 300px;
-      overflow-y: auto;
+      max-height: 400px;        /* bigger than before so you can see more at once */
+      min-height: 200px;        /* ensure it’s not too small when empty */
+      overflow-y: auto;         /* vertical scrollbar when content overflows */
       border: 1px solid #eee;
       border-radius: 4px;
       background: #f9f9f9;
       padding: 12px;
       box-sizing: border-box;
     }
+
+    /* Each individual answer “bubble” */
     .message {
       margin-bottom: 16px;
     }
     .message hr {
       border: 0;
       border-top: 1px solid #ddd;
-      margin: 8px 0;
+      margin: 12px 0;
     }
     .message p {
       margin: 0;
-      line-height: 1.4;
+      line-height: 1.6;
       color: #333;
+      white-space: pre-wrap;    /* preserve any line breaks in answerText */
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
   <div id="chatContainer">
-    <div id="chatHeader">Custom Document Chatbox</div>
+    <div id="chatHeader">Ask the AI 📖</div>
     <div id="chatBody">
-      <input 
+      <input
         id="chatInput"
         type="text"
         placeholder="Type your question here…"
@@ -113,14 +134,14 @@
   </div>
 
   <script>
-    const webhookUrl = 'https://infinig.app.n8n.cloud/webhook-test/916f5364-1ae3-405c-a9c9-b1b2869e95e9';
+    const webhookUrl = 'https://infinig.app.n8n.cloud/webhook-test/916f5364-1ae3-405c-a9c9-b1b2869e95e9'; // ← replace with your n8n webhook
 
     document.getElementById('sendBtn').onclick = async () => {
       const questionField = document.getElementById('chatInput');
       const question = questionField.value.trim();
-      if (!question) return; // Do nothing if input is empty
+      if (!question) return; // do nothing if the input is empty
 
-      // Send the question to n8n
+      // Send question to n8n
       const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,7 +150,7 @@
       const json = await res.json();
       const answerText = json.response || 'No reply yet.';
 
-      // Append the answer as a new styled message
+      // Create a new “message” div, include a horizontal rule and the answer
       const chatResponse = document.getElementById('chatResponse');
       const messageDiv = document.createElement('div');
       messageDiv.className = 'message';
@@ -139,7 +160,7 @@
       `;
       chatResponse.appendChild(messageDiv);
 
-      // Scroll to bottom if overflow
+      // Auto‐scroll to the bottom so the latest answer is visible
       chatResponse.scrollTop = chatResponse.scrollHeight;
     };
 
